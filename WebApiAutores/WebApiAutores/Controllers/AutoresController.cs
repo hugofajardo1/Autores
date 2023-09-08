@@ -19,13 +19,13 @@ namespace WebApiAutores.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Autor>>> Get() 
         {
-            return await _context.Autores.Include(x => x.Libros).ToListAsync();
+            return await _context.Autores.ToListAsync();
         }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Autor>> Get(int id)
         {
-            var autor = await _context.Autores.Include(x => x.Libros).FirstOrDefaultAsync(x => x.Id==id);
+            var autor = await _context.Autores.FirstOrDefaultAsync(x => x.Id==id);
 
             if (autor == null) { return NotFound(); }
 
@@ -35,7 +35,7 @@ namespace WebApiAutores.Controllers
         [HttpGet("{name}")]
         public async Task<ActionResult<Autor>> Get(string name)
         {
-            var autor = await _context.Autores.Include(x => x.Libros).FirstOrDefaultAsync(x => x.Name.Contains(name));
+            var autor = await _context.Autores.FirstOrDefaultAsync(x => x.Name.Contains(name));
 
             if (autor == null) { return NotFound(); }
 
@@ -43,8 +43,15 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post(Autor autor)
+        public async Task<ActionResult> Post([FromBody] Autor autor)
         {
+            
+            var existeAutorMismoNombre = await _context.Autores.AnyAsync(x => x.Name == autor.Name);
+            
+            if (existeAutorMismoNombre)
+            {
+                return BadRequest($"Ya existe un autor con el nombre {autor.Name}");
+            }
             _context.Add(autor);
             await _context.SaveChangesAsync();
             return Ok();
