@@ -21,29 +21,28 @@ namespace WebApiAutores.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Autor>>> Get() 
+        public async Task<ActionResult<List<AutorDto>>> Get() 
         {
-            return await _context.Autores.ToListAsync();
+            var autores = await _context.Autores.ToListAsync();
+            return _mapper.Map<List<AutorDto>>(autores);
         }
 
         [HttpGet("{id:int}")]
-        public async Task<ActionResult<Autor>> Get(int id)
+        public async Task<ActionResult<AutorDto>> Get(int id)
         {
             var autor = await _context.Autores.FirstOrDefaultAsync(x => x.Id==id);
 
             if (autor == null) { return NotFound(); }
 
-            return autor;
+            return _mapper.Map<AutorDto>(autor);
         }
 
         [HttpGet("{name}")]
-        public async Task<ActionResult<Autor>> Get(string name)
+        public async Task<ActionResult<List<AutorDto>>> Get(string name)
         {
-            var autor = await _context.Autores.FirstOrDefaultAsync(x => x.Name.Contains(name));
+            var autores = await _context.Autores.Where(x => x.Name.Contains(name)).ToListAsync();
 
-            if (autor == null) { return NotFound(); }
-
-            return autor;
+            return _mapper.Map<List<AutorDto>>(autores);
         }
 
         [HttpPost]
