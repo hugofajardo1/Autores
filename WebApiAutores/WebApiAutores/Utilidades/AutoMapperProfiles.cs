@@ -13,6 +13,8 @@ namespace WebApiAutores.Utilidades
 
             CreateMap <LibroCreacionDto, Libro>();
             CreateMap<Libro, LibroDto>();
+
+            CreateMap<ComentarioCreacionDto, Comentario>();
         }
     }
 }
